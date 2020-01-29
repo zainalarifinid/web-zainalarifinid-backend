@@ -1,21 +1,26 @@
 # docker-compose.yml
-version: '3.3'
+version: '3.7'
 
 services:
-
-  app:
-    build: .
-    depends_on:
-      - postgres
-    ports:
-      - "3000:3000"
-      - "9229:9229"
-    command: ["npm", "start"]
-  postgres:
+  database:
     image: postgres:9.6.14
     restart: always
     ports:
       - "5432:5432"
     environment:
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: doremi123!
+      POSTGRES_PASSWORD: doremi123
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        - NODE_ENV=development
+    container_name: backend-web
+    depends_on:
+      - database
+    links:
+      - database:postgres
+    ports:
+      - "3000:3000"
+      - "9229:9229"
